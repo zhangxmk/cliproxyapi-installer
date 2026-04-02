@@ -1,10 +1,10 @@
 # CLIProxyAPI Linux Installer
 
-A comprehensive Linux installation script for [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) that automates installation, upgrades, and management of the CLIProxyAPI service.
+A comprehensive Linux installation script for [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) that automates installation, upgrades, and management of the CLIProxyAPI service. This fork downloads release assets from this repository's GitHub Releases.
 
 ## Features
 
-- 🚀 **Automatic Installation** - Detects your Linux architecture and downloads the latest version
+- 🚀 **Automatic Installation** - Detects your Linux architecture and downloads the latest version from this repository's GitHub Releases
 - 🔄 **Smart Upgrades** - Preserves your configuration and automatically manages systemd service during upgrades
 - 🔑 **API Key Management** - Automatically generates secure API keys
 - 🛡️ **Systemd Service** - Creates and manages systemd service files with proper lifecycle management
@@ -19,10 +19,10 @@ A comprehensive Linux installation script for [CLIProxyAPI](https://github.com/r
 
 ```bash
 # Download and run the installer
-curl -fsSL https://raw.githubusercontent.com/brokechubb/cliproxyapi-installer/refs/heads/master/cliproxyapi-installer | bash
+curl -fsSL https://raw.githubusercontent.com/zhangxmk/cliproxyapi-installer/refs/heads/master/cliproxyapi-installer | bash
 
 # Or clone and run manually
-git clone https://github.com/brokechubb/cliproxyapi-installer.git
+git clone https://github.com/zhangxmk/cliproxyapi-installer.git
 cd cliproxyapi-installer
 ./cliproxyapi-installer
 ```
@@ -49,19 +49,19 @@ cd cliproxyapi-installer
      # Direct execution
      ./cli-proxy-api
 
-     # Or as a systemd service (recommended)
-     systemctl --user enable cliproxyapi.service
-     systemctl --user start cliproxyapi.service
-     systemctl --user status cliproxyapi.service
+     # Or as a system-wide systemd service (recommended)
+     sudo systemctl enable cliproxyapi.service
+     sudo systemctl start cliproxyapi.service
+     sudo systemctl status cliproxyapi.service
      ```
 
 4. **Enable autostart on boot** (recommended):
      ```bash
-     # Enable the service to start automatically on user login
-     systemctl --user enable cliproxyapi.service
+     # Enable the service to start automatically on boot
+     sudo systemctl enable cliproxyapi.service
      
      # Verify it's enabled
-     systemctl --user is-enabled cliproxyapi.service
+     sudo systemctl is-enabled cliproxyapi.service
      ```
 
 > **💡 Pro Tip**: The installer automatically manages the systemd service during upgrades. If the service is running when you upgrade, it will be gracefully stopped, updated, and restarted automatically.
@@ -170,7 +170,7 @@ sudo dnf install curl wget tar
 
 ## Systemd Service
 
-The installer creates and manages a systemd service file for easy lifecycle management:
+The installer creates and manages a system-wide systemd service file for easy lifecycle management:
 
 ### ✨ Smart Service Management
 
@@ -184,23 +184,23 @@ The installer provides intelligent service handling during upgrades:
 ### Basic Service Management
 
 ```bash
-# Enable the service (starts on user login)
-systemctl --user enable cliproxyapi.service
+# Enable the service
+sudo systemctl enable cliproxyapi.service
 
 # Start the service
-systemctl --user start cliproxyapi.service
+sudo systemctl start cliproxyapi.service
 
 # Check service status
-systemctl --user status cliproxyapi.service
+sudo systemctl status cliproxyapi.service
 
 # View service logs
-journalctl --user -u cliproxyapi.service -f
+sudo journalctl -u cliproxyapi.service -f
 
 # Stop the service
-systemctl --user stop cliproxyapi.service
+sudo systemctl stop cliproxyapi.service
 
 # Restart the service
-systemctl --user restart cliproxyapi.service
+sudo systemctl restart cliproxyapi.service
 ```
 
 ### Service Status During Upgrades
@@ -228,39 +228,39 @@ You'll see output like:
 **To enable CLIProxyAPI to start automatically on system boot:**
 
 ```bash
-# Enable the service for automatic startup on user login
-systemctl --user enable cliproxyapi.service
+# Enable the service for automatic startup on boot
+sudo systemctl enable cliproxyapi.service
 
 # Verify the service is enabled
-systemctl --user is-enabled cliproxyapi.service
+sudo systemctl is-enabled cliproxyapi.service
 
 # Check if the service will start on boot
-systemctl --user is-active cliproxyapi.service
+sudo systemctl is-active cliproxyapi.service
 ```
 
 **To disable autostart:**
 ```bash
-systemctl --user disable cliproxyapi.service
+sudo systemctl disable cliproxyapi.service
 ```
 
 **Important Notes:**
-- The `--user` flag means the service runs as your user and starts when you log in
-- For system-wide startup (requires root), you would need to manually install the service file to `/etc/systemd/system/`
-- User services require lingering to be enabled for startup without login: `loginctl enable-linger $USER`
+- The service file is installed to `/etc/systemd/system/cliproxyapi.service`
+- The service is managed as a system-wide unit, so `sudo` is required for most lifecycle commands
+- The generated unit runs the process as the user who installed it via `User=` and `Group=`
 
 **If the service is not working:**
 ```bash
 # Reload systemd daemon
-systemctl --user daemon-reload
+sudo systemctl daemon-reload
 
 # Check service status for errors
-systemctl --user status cliproxyapi.service
+sudo systemctl status cliproxyapi.service
 
 # View detailed logs
-journalctl --user -u cliproxyapi.service -n 50
+sudo journalctl -u cliproxyapi.service -n 50
 
 # Check if service file exists
-ls -la ~/.config/systemd/user/cliproxyapi.service
+ls -la /etc/systemd/system/cliproxyapi.service
 ```
 
 ## Troubleshooting
@@ -290,7 +290,7 @@ ls -la ~/.config/systemd/user/cliproxyapi.service
 4. **Service Won't Start**
     ```bash
     # Check service logs
-    journalctl --user -u cliproxyapi.service -n 50
+    sudo journalctl -u cliproxyapi.service -n 50
     
     # Check configuration
     ./cliproxyapi-installer check-config
@@ -305,33 +305,33 @@ ls -la ~/.config/systemd/user/cliproxyapi.service
     pkill cli-proxy-api
     
     # Then restart the service
-    systemctl --user restart cliproxyapi.service
+    sudo systemctl restart cliproxyapi.service
     ```
 
 6. **Systemd Service Issues**
     ```bash
     # Reload systemd daemon
-    systemctl --user daemon-reload
+    sudo systemctl daemon-reload
     
     # Check if service file exists
-    ls -la ~/.config/systemd/user/cliproxyapi.service
+    ls -la /etc/systemd/system/cliproxyapi.service
     
     # Reset service (disable and re-enable)
-    systemctl --user disable cliproxyapi.service
-    systemctl --user enable cliproxyapi.service
-    systemctl --user start cliproxyapi.service
+    sudo systemctl disable cliproxyapi.service
+    sudo systemctl enable cliproxyapi.service
+    sudo systemctl start cliproxyapi.service
     ```
 
 7. **Upgrade Service Issues**
     ```bash
     # If service doesn't restart after upgrade
-    systemctl --user status cliproxyapi.service
+    sudo systemctl status cliproxyapi.service
     
     # Check recent service logs
-    journalctl --user -u cliproxyapi.service -n 20
+    sudo journalctl -u cliproxyapi.service -n 20
     
     # Manually restart if needed
-    systemctl --user restart cliproxyapi.service
+    sudo systemctl restart cliproxyapi.service
     ```
 
 8. **Configuration Protection Issues**
@@ -344,7 +344,7 @@ ls -la ~/.config/systemd/user/cliproxyapi.service
     cp ~/cliproxyapi/config_backup/config_YYYYMMDD_HHMMSS.yaml ~/cliproxyapi/config.yaml
     
     # Restart service after restoring
-    systemctl --user restart cliproxyapi.service
+    sudo systemctl restart cliproxyapi.service
     ```
 
 ### Getting Help
@@ -364,7 +364,7 @@ ls -la ~/.config/systemd/user/cliproxyapi.service
 
 - API keys are automatically generated using cryptographically secure random strings
 - Configuration files are stored in your home directory with standard permissions
-- The systemd service runs with appropriate security restrictions
+- The systemd service is installed system-wide and runs as the installing user
 - Backups of configuration are created automatically during upgrades
 - **User configurations are never overwritten** - your modifications are protected during upgrades
 
@@ -415,7 +415,7 @@ This installer script is released under the same license as CLIProxyAPI.
 ## Support
 
 - **CLIProxyAPI Documentation**: https://github.com/router-for-me/CLIProxyAPI
-- **Installer Issues**: https://github.com/brokechubb/cliproxyapi-installer/issues
+- **Installer Issues**: https://github.com/zhangxmk/cliproxyapi-installer/issues
 - **General Help**: Run `./cliproxyapi-installer --help`
 
 ## Changelog
